@@ -1,0 +1,158 @@
+// Asteroids: A New Hope a Star Wars themed take on the classic game
+//   By Kurt Kruger and Autumn Smith.
+//   Autumn Smith - Artwork
+//   Kurt Kruger - Coding
+
+//controsls
+boolean keyW = false;
+boolean keyA = false;
+boolean keyS = false;
+boolean keyD = false;
+boolean keySpace = false; //this controls the shooting
+
+//Misc
+int lives; //your lives
+int stage = -1;//used to ctrl how many asteroids get made
+float rotateAngle = 0.1;
+boolean collision = false;
+int gameState = 1;
+
+//Bullets
+float bulletSpeed = 9; //bullet speed 
+
+//Asteroids
+int numAsteroids = 1; //initial # of asteroids
+PImage asteroidImg = new PImage(); //stores the asteroid png
+int startRadius = 40; //starting radius of the asteroids
+
+//images
+//PImage img = new PImage();
+PImage space;
+
+//Arrays
+ArrayList<Asteroids> asteroids = new ArrayList<Asteroids>(0); //sets up the array to store the asteroids
+ArrayList<Bullet> bullets = new ArrayList<Bullet>(0);//sets up the array to store the bullets
+
+//Ship
+PImage falcon;
+//float shipSpeed = 2;
+Ship ship;
+
+void setup() {
+  gameState = 1;
+  size(900, 600, P2D); //the size of the screen
+  //falcon = loadImage("space.png"); //player img 
+  //asteroidImg = loadImage("Asteroid0.png"); //asteropid img
+  lives = 3; //starting life total
+  reset();
+}
+
+void draw() {
+  //Draw everything throw in a picture bachground
+  if (gameState == 1) { //changes game state from title screen to main game state
+    space = loadImage("space.png");  //the background img
+    image(space, 0, 0, 900, 600);
+    textAlign(CENTER);
+    text("Asteroids: A New Hope", 450, 300);
+  }
+
+  if (keyPressed == true) {
+    gameState = 2;
+  }
+  
+  if (gameState == 2) { 
+    space = loadImage("space.png"); //the background img
+    image(space, 0, 0, 900, 600);
+
+
+
+    if (lives >= 0 &&  asteroids.size()>0) {
+
+      ship.update();
+      ship.sides();
+
+      //controls the asteroids 
+      for (Asteroids a : asteroids) {
+        a.update();
+        a.sides();
+        a.draw();
+      }
+
+      //spawns a new ship when you die
+      /*if (ship.collision(asteroids)) {
+       lives--;
+       ship = new Ship();
+       
+       }*/
+
+      for (int i = 0; i < bullets.size(); i++) {
+        bullets.get(i).edges();
+        if (bullets.get(i).update()) {
+          bullets.remove(i);
+          i--;
+        }
+        if (i < 0) {
+          break;
+        }
+        bullets.get(i).render();
+        if (bullets.get(i).checkCollision(asteroids)) {
+          bullets.remove(i);
+          i--;
+        }
+      }
+    }
+  }// end of if GameState 2
+
+
+  //this keeps the controls of the ship
+  void handleKey(int code, boolean isDown) {
+    switch(code) { //this sets up the switch, a much cleaner code block instead of the For loop
+    case 87:
+      keyW = isDown;
+      break;
+    case 65:
+      keyA = isDown;
+      break;
+    case 83:
+      keyS = isDown;
+      break;
+    case 68:
+      keyD = isDown;
+      break;
+    case 32:
+      keySpace = isDown;
+      break;
+    }
+  }
+
+  void keyPressed() { //this helps determine what all of the key codes are 
+    //println("hello!");
+    //println(keyCode);  
+    handleKey(keyCode, true);
+  }
+
+  void keyReleased() { //this is needed to make the movement fluid 
+    handleKey(keyCode, false);
+  }
+
+  void reset() { //resets the games after game loss and new stage
+    ship = new Ship();
+    bullets = new ArrayList<Bullet>(0);
+    asteroids = new ArrayList<Asteroids>(0); 
+    // spawning asteroids
+    for (int i = 0; i < numAsteroids*stage; i++) {
+      PVector position = new PVector((int)(Math.random()*width), (int)(Math.random()-100));
+      asteroids.add(new Asteroids(position, startRadius, asteroidImg, stage));
+    }
+  }
+
+  void collision(int x1, int y1, int d1, int x2, int y2, int d2) {
+   float xDis = x1 - x2;
+   float yDis = y1 - y2;
+   float disSqr = ((xDis*xDis) + (yDis*yDis));  
+   
+   if (disSqr < (radius1 +radius2)*(radius1 +radius2)) {
+   a.breakUp(asteroids);
+   collision = true;
+   }
+   }
