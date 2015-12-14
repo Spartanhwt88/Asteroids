@@ -1,0 +1,65 @@
+class Asteroids {
+  float radius;
+  PVector position;
+  PVector velocity;
+  PVector rotation;
+  PImage img;
+  int stage;
+  float angle = 0;
+
+  public Asteroids(PVector pos, float rad, PImage img, int stg) {
+    radius = rad;
+    stage = stg;
+    position = pos;
+    float angle = random(-PI, PI);
+    //rotation = new PVector(cos(angle), sin(angle));//see if diff #s feel better
+  }
+  void draw() {
+    pushMatrix();
+    translate(position.x, position.y);
+    rotate(angle);
+    image(img, -radius, -radius, radius*2, radius*2);
+    popMatrix();
+  }
+
+  void breakUp(ArrayList<Asteroids> asteroids) {
+    if (radius <= 30) { //this finally kills the last asteroid
+      asteroids.remove(this);
+    } else if (radius < 33) {
+      for (int i = 0; i < 2; i++) {
+        float angle = random(2*PI);
+        PVector rand = new PVector(radius*sin(angle), radius*cos(angle));
+        rand.add(position);
+        asteroids.add(new Asteroids(rand, radius*.8, img, stage));
+      }
+      asteroids.remove(this);
+    } else {
+      for (int i = 0; i < 3; i++) {
+        float angle = random(2*PI);
+        PVector rand = new PVector(radius*sin(angle), radius*cos(angle));
+        rand.add(position);
+        asteroids.add(new Asteroids(rand, radius*.8, img, stage));
+      }
+      asteroids.remove(this);
+    }
+  }
+
+  void update() {
+    position.add(velocity);
+  }
+
+  void sides() { //control♥s how everything wraps around the screen
+    if (position.x < 0) {
+      position.x = width;
+    }
+    if (position.y < 0) {
+      position.y = height;
+    }
+    if (position.x > width) {
+      position.x = 0;
+    }
+    if (position.y > height) {
+      position.y = 0;
+    }
+  }
+} //End of class
