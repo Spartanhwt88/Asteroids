@@ -1,0 +1,68 @@
+class Ship {
+  PVector position = new PVector(); //this is the starting pos of the ship
+  PVector velocity = new PVector(0, 0); //this determines the 
+  PVector acceleration = new PVector();
+  PVector rotation = new PVector();
+  float angle = 0;
+  PImage falcon; 
+  float drag = 0.8;
+  float r = 10;
+
+
+  public Ship() {
+    position.x = 250;
+    position.y = 250;
+    velocity = new PVector();
+    angle = 0;
+  }
+
+  void update() {
+
+    if (keyD) position.rotate(radians(2)); //Thanks to Sasha-Shum on github for this idea 
+    if (keyA) position.rotate(radians(-2));
+    if (keyW) velocity.y--;
+    if (keyS) velocity.y++;
+    if (keySpace) shoot();
+
+    velocity.x *= .9;
+    velocity.y *= .9;
+
+    position.add(velocity);
+  }
+  void draw() {
+    //Import a picture that Audi draws
+    falcon = loadImage("Falcon.png");
+    ellipse(position.x, position.y, 50, 50);
+  }
+
+
+  void sides() { //controls how everything wraps around the screen
+    if (position.x < 0) {
+      position.x = width;
+    }
+    if (position.y < 0) {
+      position.y = height;
+    }
+    if (position.x > width) {
+      position.x = 0;
+    }
+    if (position.y > height) {
+      position.y = 0;
+    }
+  }
+
+  void collision(ArrayList<Asteroids> asteroids) {
+    for (Asteroids a : asteroids) {
+      PVector dist = PVector.sub(position, a.position);
+      if (dist.mag() < a.radius) {
+        a.breakUp(asteroids);     
+        collision = true;
+      }
+    }
+  }
+
+  void shoot() {
+   PVector pos = new PVector(0, ship.r*2);
+   rotate2D(pos, heading(ship.rotation) + PI/2);
+   }
+} //end of class
